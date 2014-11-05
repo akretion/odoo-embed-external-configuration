@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Production Order -->
+        <record id="mrp_production_form_view" model="ir.ui.view">
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="arch" type="xml">
+                <field name="date_planned" position="after">
+                    <!--<field name="serial_number" string="Lot de Production"/>                    -->
+                    <!--<field name="on_subcontract" readonly="1" attrs="{'invisible':[('on_subcontract','=',False)]}" />-->
+                    <!--<field name="custom_bom_component" invisible="1"/>-->
+                </field>
+                <field name="origin" position="after">
+                    <!--<field name="sale_line" readonly="1" attrs="{'invisible':[('on_subcontract','=',False)]}"/>-->
+                    <field name="sale_line" readonly="1"/>
+                    <!--<field name="manufacture_order_id" readonly="1" attrs="{'invisible':[('on_subcontract','=',False)]}"/>-->
+                    <!--<field name="tech_description" invisible="1"/>-->
+                </field>
+                <!--<xpath expr="//notebook/page[@string='Extra Information']" position="before">-->
+                    <!--<page string="Technical Description">-->
+                        <!--<field name="table_tech_description" attrs="{'invisible':[('on_subcontract','=',False)]}" colspan="4" nolabel="1"/>-->
+                    <!--</page>-->
+                <!--</xpath>-->
+            </field>
+        </record>
+
+    </data>
+</openerp>
