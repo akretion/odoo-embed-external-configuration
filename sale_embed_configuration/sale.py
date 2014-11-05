@@ -33,10 +33,10 @@ class SaleOrderLine(orm.Model):
         return True
 
     _columns = {
-        'technical_config': fields.text(
-            'Technical Configuration',
-            help="Allow to set custom configuration with json like notation"),
-        'configuration': fields.serialized('Configuration', readonly=True),
+        'configuration': fields.serialized(
+            'Configuration',
+            readonly=True,
+            help="Allow to set custom configuration"),
         'config_text': fields.function(
             _get_configuration,
             fnct_inv=_set_configuration,
@@ -44,13 +44,14 @@ class SaleOrderLine(orm.Model):
             string='Configuration'
         ),
         'prodlot_id': fields.many2one(
-            'stock.production.lot', 'Serial Number', readonly=True
-        )
+            'stock.production.lot',
+            string='Serial Number',
+            readonly=True)
     }
 
 
-class sale_order(orm.Model):
-    _inherit = 'sale'
+class SaleOrder(orm.Model):
+    _inherit = 'sale.order'
 
     def _prepare_vals_lot_number(self, cr, uid, order_line_id, index_lot,
                                  context=None):
@@ -68,18 +69,18 @@ class sale_order(orm.Model):
     def action_button_confirm(self, cr, uid, ids, context=None):
         assert len(ids) == 1, 'This option should only be used for a single id at a time.'
         prodlot_m = self.pool.get('stock.production.lot')
-        sale_order = self.browse(cr, uid, ids, context=context)
-        index_lot = 1
-        for line in sale_order.order_line:
-            if line.product_id.product_tmpl_id.track_from_order:
-                vals = self._prepare_vals_lot_number(
-                    cr, uid, line.id, index_lot, context=context
-                )
-                prodlot_id = prodlot_m.create(
-                    cr, uid, vals
-                )
-                line.write({'prodlot_id': prodlot_id})
-                index_lot += 1
-        return super(sale_order, self).action_button_confirm(
+        for sale_order in self.browse(cr, uid, ids, context=context):
+            index_lot = 1
+            for line in sale_order.order_line:
+                if line.product_id.track_from_order:
+                    vals = self._prepare_vals_lot_number(
+                        cr, uid, line.id, index_lot, context=context
+                    )
+                    prodlot_id = prodlot_m.create(
+                        cr, uid, vals
+                    )
+                    line.write({'prodlot_id': prodlot_id})
+                    index_lot += 1
+        return super(SaleOrder, self).action_button_confirm(
             cr, uid, ids, context=context
         )
