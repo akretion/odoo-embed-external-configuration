@@ -2,6 +2,7 @@
 ##############################################################################
 #
 #    Copyright (C) 2014 Akretion (http://www.akretion.com).
+#    @author Adrien CHAUSSENDE <adrien.chaussende@akretion.com>
 #    @author David BEAL <david.beal@akretion.com>
 #
 #    This program is free software: you can redistribute it and/or modify
