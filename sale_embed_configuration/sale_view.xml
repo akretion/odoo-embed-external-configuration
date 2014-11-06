@@ -6,12 +6,16 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
+				<xpath expr="//field[@name='order_line']/form/field[@name='name']" position="after">
+						<label for="config_text"/>
+						<field name="config_text"/>
+				</xpath>
                 <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="after">
-                    <field name="technical_config"/>
+                    <field name="prodlot_id"/>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/form/group/group/field[@name='product_id']" position="after">
-                    <field name="technical_config"/>
-                </xpath>
+                    <field name="prodlot_id"/>
+                </xpath> 
             </field>
         </record>
 

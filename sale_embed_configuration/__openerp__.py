@@ -28,12 +28,11 @@
     'description': """
         Sale Order Line Technical Configuration
     """,
-    'author': 'Enova, Akretion',
+    'author': 'Akretion',
     'website': '',
-    'depends': ['sale',
-                'stock',],
+    'depends': ['sale_stock'],
     'data': [
-        #'sale_view.xml',
+        'sale_view.xml',
         ],
     'installable': True,
     'auto_install': False,

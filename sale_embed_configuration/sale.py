@@ -59,7 +59,7 @@ class SaleOrder(orm.Model):
             cr, uid, order_line_id
         )
         lot_number = "%s-%03d" % (
-            order_line.order_id.order_name, index_lot + 1)
+            order_line.order_id.order_name, index_lot)
         return {
             'name': lot_number,
             'product_id': order_line.product_id.id,
@@ -77,10 +77,18 @@ class SaleOrder(orm.Model):
                         cr, uid, line.id, index_lot, context=context
                     )
                     prodlot_id = prodlot_m.create(
-                        cr, uid, vals
+                        cr, uid, vals, context=context
                     )
                     line.write({'prodlot_id': prodlot_id})
                     index_lot += 1
         return super(SaleOrder, self).action_button_confirm(
             cr, uid, ids, context=context
         )
+
+    def _prepare_order_line_move(self, cr, uid, order, line, picking_id,
+                                    date_planned, context=None):
+        result = super(SaleOrder, self)._prepare_order_line_move(
+            cr, uid, order, line, picking_id, date_planned, context=context
+        )
+        result.update({'prodlot_id' : line.prodlot_id.id})
+        return result
