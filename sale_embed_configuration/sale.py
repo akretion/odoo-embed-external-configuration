@@ -59,7 +59,7 @@ class SaleOrder(orm.Model):
             cr, uid, order_line_id
         )
         lot_number = "%s-%03d" % (
-            order_line.order_id.order_name, index_lot)
+            order_line.order_id.name, index_lot)
         return {
             'name': lot_number,
             'product_id': order_line.product_id.id,

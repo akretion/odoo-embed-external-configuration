@@ -11,8 +11,8 @@
 from osv import orm, fields
 
 
-class ProductTemplate(orm.Model):
-    _inherit = 'product.template'
+class ProductProduct(orm.Model):
+    _inherit = 'product.product'
 
     _columns = {
         'track_from_order': fields.boolean(
