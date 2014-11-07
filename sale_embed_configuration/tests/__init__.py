@@ -19,8 +19,8 @@
 #
 ###############################################################################
 
-from . import test_configurator
+from . import test_sale_embed_configuration
 
 checks = [
-    test_configurator,
+    test_sale_embed_configuration,
 ]
