@@ -30,10 +30,11 @@
     """,
     'author': 'Akretion',
     'website': '',
-    'depends': ['sale_stock'],
+    'depends': ['sale_stock', 'sale_exceptions'],
     'data': [
         'sale_view.xml',
-        'product_view.xml'
+        'product_view.xml',
+        'sale_data.xml',
         ],
     'installable': True,
     'auto_install': False,

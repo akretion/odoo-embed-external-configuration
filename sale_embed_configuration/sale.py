@@ -32,6 +32,10 @@ class SaleOrderLine(orm.Model):
                 context=context)
         return True
 
+    def is_correct_config(self, cr, uid, ids, context=None):
+        """ Technical configuration checker"""
+        return True
+
     _columns = {
         'configuration': fields.serialized(
             'Configuration',
@@ -55,6 +59,7 @@ class SaleOrder(orm.Model):
 
     def _prepare_vals_lot_number(self, cr, uid, order_line_id, index_lot,
                                  context=None):
+        """Prepare values before creating a lot number"""
         order_line = self.pool.get('sale.order.line').browse(
             cr, uid, order_line_id
         )

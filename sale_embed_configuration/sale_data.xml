@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+
+        <record id="sale_order_tech_config_rule" model="exception.rule">
+            <field name="name">Bad Technical Configuration</field>
+            <field name="description"></field>
+            <field name="sequence">50</field>
+            <field name="model">sale.order.line</field>
+            <field name="code">if not object.is_correct_config():
+    failed=True
+            </field>
+            <field name="active" eval="False"/>
+        </record>
+
+    </data>
+</openerp>
