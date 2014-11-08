@@ -22,3 +22,14 @@ class ProductProduct(orm.Model):
                  "of the Sale Order"
         )
     }
+
+
+class StockProductionLot(orm.Model):
+    _inherit = 'stock.production.lot'
+
+    _columns = {
+        'configuration': fields.serialized(
+            'Configuration',
+            readonly=True,
+            help="Allow to set custom configuration"),
+    }

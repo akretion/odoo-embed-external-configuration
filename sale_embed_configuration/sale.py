@@ -53,6 +53,13 @@ class SaleOrderLine(orm.Model):
             readonly=True)
     }
 
+    def copy(self, cr, uid, id, default=None, context=None):
+        if default is None:
+            default = {}
+        default['prodlot_id'] = False
+        return super(SaleOrderLine, self).copy(cr, uid, id,
+                                               default, context=context)
+
 
 class SaleOrder(orm.Model):
     _inherit = 'sale.order'
@@ -69,6 +76,7 @@ class SaleOrder(orm.Model):
             'name': lot_number,
             'product_id': order_line.product_id.id,
             'company_id': order_line.order_id.company_id.id,
+            'configuration': order_line.order_id.configuration,
         }
 
     def action_button_confirm(self, cr, uid, ids, context=None):
@@ -91,9 +99,9 @@ class SaleOrder(orm.Model):
         )
 
     def _prepare_order_line_move(self, cr, uid, order, line, picking_id,
-                                    date_planned, context=None):
+                                 date_planned, context=None):
         result = super(SaleOrder, self)._prepare_order_line_move(
             cr, uid, order, line, picking_id, date_planned, context=context
         )
-        result.update({'prodlot_id' : line.prodlot_id.id})
+        result.update({'prodlot_id': line.prodlot_id.id})
         return result
