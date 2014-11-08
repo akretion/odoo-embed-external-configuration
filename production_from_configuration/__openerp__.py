@@ -21,16 +21,16 @@
 
 
 {
-    'name': 'Sale Technical Configuration',
+    'name': 'Production From Configuration',
     'version': '1.0',
     'category': 'Generic Modules',
     'description': """
-        Sale Order Line Technical Configuration
+        Production From Configuration
     """,
-    'author': 'Enova, Akretion',
+    'author': 'Akretion',
     'website': '',
-    'depends': ['sale'],
-    'data': ['mrp_view.xml'],
+    'depends': ['sale', 'mrp'],
+    'data': [],
     'installable': True,
     'auto_install': False,
     'application': False,

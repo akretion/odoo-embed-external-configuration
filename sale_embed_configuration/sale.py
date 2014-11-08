@@ -19,7 +19,7 @@ class SaleOrderLine(orm.Model):
     def _get_configuration(self, cr, uid, ids, field_name, arg, context=None):
         res = {}
         for line in self.browse(cr, uid, ids, context=context):
-            res[line.id] = simplejson.dumps(line.configuration)
+            res[line.id] = simplejson.dumps(line.config)
         return res
 
     def _set_configuration(self, cr, uid, ids, field_name, field_value, arg,
@@ -27,9 +27,10 @@ class SaleOrderLine(orm.Model):
         if isinstance(ids, int) or isinstance(ids, long):
             ids = [ids]
         for line in self.browse(cr, uid, ids, context=context):
-            self.write(cr, uid, line.id, {
-                field_name.replace('_text', ''): simplejson.loads(field_value)},
-                context=context)
+            if field_value:
+                self.write(cr, uid, line.id, {
+                    field_name.replace('_text', ''): simplejson.loads(
+                        field_value)}, context=context)
         return True
 
     def is_correct_config(self, cr, uid, ids, context=None):
@@ -37,7 +38,7 @@ class SaleOrderLine(orm.Model):
         return True
 
     _columns = {
-        'configuration': fields.serialized(
+        'config': fields.serialized(
             'Configuration',
             readonly=True,
             help="Allow to set custom configuration"),
@@ -53,12 +54,12 @@ class SaleOrderLine(orm.Model):
             readonly=True)
     }
 
-    def copy(self, cr, uid, id, default=None, context=None):
+    def copy_data(self, cr, uid, id, default=None, context=None):
         if default is None:
             default = {}
         default['prodlot_id'] = False
-        return super(SaleOrderLine, self).copy(cr, uid, id,
-                                               default, context=context)
+        return super(SaleOrderLine, self).copy_data(
+            cr, uid, id, default, context=context)
 
 
 class SaleOrder(orm.Model):
@@ -76,7 +77,7 @@ class SaleOrder(orm.Model):
             'name': lot_number,
             'product_id': order_line.product_id.id,
             'company_id': order_line.order_id.company_id.id,
-            'configuration': order_line.order_id.configuration,
+            'config': order_line.config,
         }
 
     def action_button_confirm(self, cr, uid, ids, context=None):

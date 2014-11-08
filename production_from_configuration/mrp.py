@@ -8,21 +8,37 @@
 #
 ##############################################################################
 
-from osv import orm, fields
+from osv import orm
 
 
-class mrp_production(orm.Model):
-    """
-    Purpose to generate manufacturing base on custom product raw material
+class MrpProduction(orm.Model):
+    """ Purpose to generate manufacturing base on custom product raw material
     """
     _inherit = 'mrp.production'
 
-    _columns = {
-        'sale_line': fields.many2one('sale.order.line','Sale Line'),
-        #'on_subcontract': fields.boolean('On Subcontract?'),
-        #'serial_number': fields.related('soline_subcontract', 'serial_number', type='char', relation='sale.order.line', string='Serial Number', store=True),
-        #'custom_bom_component': fields.text('Custom BoM Components', readonly=True),
-        #'tech_description': fields.text('Custom BoM Components', readonly=True),
-        #'table_tech_description': fields.html('Technical Description', readonly=True, states={'draft': [('readonly', False)]}),
-        #'manufacture_order_id': fields.char('Manufacture Order ID', size=200)
-    }
+    def _get_product_from_configuration(
+            self, cr, uid, procurement_id, product_data, context=None):
+        return product_data
+
+    def make_mo(self, cr, uid, ids, context=None):
+        result = {}
+        for procurement in self.pool['procurement.order'].browse(
+                cr, uid, ids, context=context):
+            context.update({'procurement': procurement.id})
+            res = super(MrpProduction, self).make_mo(
+                cr, uid, [procurement.id], context=context)
+            result.append(res)
+        return result
+
+    def _bom_explode(
+            self, cr, uid, bom, factor, properties=None, addthis=False,
+            level=0, routing_id=False, context=None):
+        product_data, workcenter_data = super(
+            MrpProduction, self)._bom_explode(
+                cr, uid, bom, factor, properties=properties, addthis=addthis,
+                level=level, routing_id=routing_id, context=context)
+        procurement_id = context.get('procurement', False)
+        if procurement_id:
+            self._get_product_from_configuration(
+                cr, uid, procurement_id, product_data, context=context)
+        return product_data, workcenter_data
