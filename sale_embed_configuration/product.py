@@ -15,8 +15,9 @@ class ProductProduct(orm.Model):
     _inherit = 'product.product'
 
     _columns = {
-        'track_from_order': fields.boolean(
+        'track_from_sale': fields.boolean(
             'Track Lots since Sale Order',
+            oldname="track_from_order",
             help="Forces to specifiy a Serial Number for all "
                  "moves containing this product since the confirm "
                  "of the Sale Order"

@@ -55,7 +55,7 @@ class SaleOrderLine(orm.Model):
     }
 
     _defaults = {
-        'config': '{"tech_configuration":{"bill_of_material":{"parameter":[],"valeurs":{"A00780A000":1.058,"A00782A000":2.059}},"tech_description":{"0400:coupe glissiere(mm)":"936","0350:largeur coupe(mm)":"962","0150:taille de coffre":"35","0300:Hauteur store(mm)":"977","0250:Largeur store(mm)":"985","0100:couleur profil":"blanc","0200:couleur mecanisme":"mecanisme blanc"}}}'
+        'config': {"tech_configuration":{"bill_of_material":{"parameter":[],"valeurs":{"A00780A000":1.058,"A00782A000":2.059}},"tech_description":{"0400:coupe glissiere(mm)":"936","0350:largeur coupe(mm)":"962","0150:taille de coffre":"35","0300:Hauteur store(mm)":"977","0250:Largeur store(mm)":"985","0100:couleur profil":"blanc","0200:couleur mecanisme":"mecanisme blanc"}}}
     }
 
     def copy_data(self, cr, uid, id, default=None, context=None):
@@ -90,7 +90,7 @@ class SaleOrder(orm.Model):
         for sale_order in self.browse(cr, uid, ids, context=context):
             index_lot = 1
             for line in sale_order.order_line:
-                if line.product_id.track_from_order:
+                if line.product_id.track_from_sale:
                     vals = self._prepare_vals_lot_number(
                         cr, uid, line.id, index_lot, context=context
                     )
