@@ -29,7 +29,7 @@
     """,
     'author': 'Akretion',
     'website': '',
-    'depends': ['sale', 'mrp'],
+    'depends': ['mrp'],
     'data': [],
     'installable': True,
     'auto_install': False,

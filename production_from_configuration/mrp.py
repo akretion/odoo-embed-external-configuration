@@ -16,29 +16,39 @@ class MrpProduction(orm.Model):
     """
     _inherit = 'mrp.production'
 
-    def _get_product_from_configuration(
-            self, cr, uid, procurement_id, product_data, context=None):
+    def _get_product_from_config(
+            self, cr, uid, production, product_data, context=None):
         return product_data
 
-    def make_mo(self, cr, uid, ids, context=None):
-        result = {}
-        for procurement in self.pool['procurement.order'].browse(
-                cr, uid, ids, context=context):
-            context.update({'procurement': procurement.id})
-            res = super(MrpProduction, self).make_mo(
-                cr, uid, [procurement.id], context=context)
-            result.append(res)
-        return result
+    def _action_compute_lines(
+            self, cr, uid, ids, properties=None, context=None):
+        if context is None:
+            context = {}
+        res = {}
+        for production in self.browse(cr, uid, ids, context=context):
+            context.update({'production': production})
+            res = super(MrpProduction, self)._action_compute_lines(
+                cr, uid, ids, properties=properties, context=context)
+        return res
+
+
+class MrpBom(orm.Model):
+    _inherit = 'mrp.bom'
 
     def _bom_explode(
             self, cr, uid, bom, factor, properties=None, addthis=False,
             level=0, routing_id=False, context=None):
+        prod_m = self.pool['mrp.production']
+        if context is None:
+            context = {}
         product_data, workcenter_data = super(
-            MrpProduction, self)._bom_explode(
+            MrpBom, self)._bom_explode(
                 cr, uid, bom, factor, properties=properties, addthis=addthis,
                 level=level, routing_id=routing_id, context=context)
-        procurement_id = context.get('procurement', False)
-        if procurement_id:
-            self._get_product_from_configuration(
-                cr, uid, procurement_id, product_data, context=context)
+        production = context.get('production', False)
+        if production:
+            new_product_data = prod_m._get_product_from_config(
+                cr, uid, production, product_data, context=context)
+            del product_data
+            product_data = list(new_product_data)
         return product_data, workcenter_data
