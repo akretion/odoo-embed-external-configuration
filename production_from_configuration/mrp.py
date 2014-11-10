@@ -31,6 +31,18 @@ class MrpProduction(orm.Model):
                 cr, uid, ids, properties=properties, context=context)
         return res
 
+    def create(self, cr, uid, vals, context=None):
+        if context is None:
+            context = {}
+        move_obj = self.pool['stock.move']
+        if 'move_prod_id' in vals:
+            move = move_obj.browse(
+                cr, uid, vals['move_prod_id'], context=context)
+            if move.prodlot_id:
+                vals['name'] = move.prodlot_id.name
+        return super(MrpProduction, self).create(
+            cr, uid, vals, context=context)
+
 
 class MrpBom(orm.Model):
     _inherit = 'mrp.bom'
