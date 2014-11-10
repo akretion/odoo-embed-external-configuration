@@ -86,7 +86,7 @@ class SaleOrder(orm.Model):
         for sale_order in self.browse(cr, uid, ids, context=context):
             index_lot = 1
             for line in sale_order.order_line:
-                if line.product_id.track_from_order:
+                if line.product_id.track_from_sale:
                     vals = self._prepare_vals_lot_number(
                         cr, uid, line.id, index_lot, context=context
                     )
