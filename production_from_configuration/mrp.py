@@ -43,6 +43,14 @@ class MrpProduction(orm.Model):
         return super(MrpProduction, self).create(
             cr, uid, vals, context=context)
 
+    def _make_production_produce_line(self, cr, uid, production, context=None):
+        if context is None:
+            context = {}
+        ctx = context.copy()
+        ctx['default_prodlot_id'] = \
+            production.move_prod_id.prodlot_id.id
+        return super(MrpProduction, self)._make_production_produce_line(
+            cr, uid, production, context=ctx)
 
 class MrpBom(orm.Model):
     _inherit = 'mrp.bom'
