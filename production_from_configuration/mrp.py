@@ -52,6 +52,7 @@ class MrpProduction(orm.Model):
         return super(MrpProduction, self)._make_production_produce_line(
             cr, uid, production, context=ctx)
 
+
 class MrpBom(orm.Model):
     _inherit = 'mrp.bom'
 
@@ -72,3 +73,14 @@ class MrpBom(orm.Model):
             del product_data
             product_data = list(new_product_data)
         return product_data, workcenter_data
+
+
+class ProcurementOrder(orm.Model):
+    _inherit = 'procurement.order'
+
+    def make_mo(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
+        context.update({'production_from_procurement': True})
+        return super(ProcurementOrder, self).make_mo(
+            cr, uid, ids, context=context)
