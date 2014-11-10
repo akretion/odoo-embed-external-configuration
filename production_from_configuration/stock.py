@@ -44,3 +44,13 @@ class StockMove(orm.Model):
             'company_id': move_master.company_id.id,
             'config': move_master.prodlot_id.config,
         }
+
+    def create_chained_picking(self, cr, uid, moves, context=None):
+        new_moves = super(StockMove, self).create_chained_picking(
+            cr, uid, moves, context=context)
+        for new_move in new_moves:
+            if new_move.move_dest_id.prodlot_id:
+                new_move.write({
+                    'prodlot_id': new_move.move_dest_id.prodlot_id.id,
+                    })
+        return new_moves
