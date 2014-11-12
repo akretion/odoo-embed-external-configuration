@@ -47,8 +47,7 @@ class MrpProduction(orm.Model):
         if context is None:
             context = {}
         ctx = context.copy()
-        ctx['default_prodlot_id'] = \
-            production.move_prod_id.prodlot_id.id
+        ctx['default_prodlot_id'] = production.move_prod_id.prodlot_id.id
         return super(MrpProduction, self)._make_production_produce_line(
             cr, uid, production, context=ctx)
 
