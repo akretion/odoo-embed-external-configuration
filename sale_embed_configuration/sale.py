@@ -80,7 +80,7 @@ class SaleOrder(orm.Model):
             'config': order_line.config,
         }
 
-    def action_button_confirm(self, cr, uid, ids, context=None):
+    def action_ship_create(self, cr, uid, ids, context=None):
         assert len(ids) == 1, 'This option should only be used for a single id at a time.'
         prodlot_m = self.pool.get('stock.production.lot')
         for sale_order in self.browse(cr, uid, ids, context=context):
@@ -95,7 +95,7 @@ class SaleOrder(orm.Model):
                     )
                     line.write({'prodlot_id': prodlot_id})
                     index_lot += 1
-        return super(SaleOrder, self).action_button_confirm(
+        return super(SaleOrder, self).action_ship_create(
             cr, uid, ids, context=context
         )
 
