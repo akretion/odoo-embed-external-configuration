@@ -27,10 +27,11 @@ class SaleOrderLine(orm.Model):
         if isinstance(ids, int) or isinstance(ids, long):
             ids = [ids]
         for line in self.browse(cr, uid, ids, context=context):
-            if field_value:
-                self.write(cr, uid, line.id, {
-                    field_name.replace('_text', ''): simplejson.loads(
-                        field_value)}, context=context)
+            if not field_value:
+                field_value = "{}"
+            self.write(cr, uid, line.id, {
+                field_name.replace('_text', ''): simplejson.loads(
+                    field_value)}, context=context)
         return True
 
     def is_correct_config(self, cr, uid, ids, context=None):
