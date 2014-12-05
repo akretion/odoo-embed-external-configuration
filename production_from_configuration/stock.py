@@ -8,8 +8,7 @@
 #
 ##############################################################################
 
-from osv import orm
-
+from openerp.osv import orm
 
 
 class StockMove(orm.Model):
@@ -21,7 +20,7 @@ class StockMove(orm.Model):
         if context is None:
             context = {}
         ctx = context.copy()
-        ctx['prodlot_base_name'] = move.prodlot_id.name
+        ctx['prodlot_base_name'] = move.restrict_lot_id.name
         ctx['prodlot_index'] = 1
         ctx['explode_prodlot'] = True
 
@@ -43,7 +42,7 @@ class StockMove(orm.Model):
                     prodlot_vals = self._prepare_lot_for_move(
                         cr, uid, line['product_id'], move, context['prodlot_index'],
                         context=context)
-                    res['prodlot_id'] = prodlot_obj.create(
+                    res['restrict_lot_id'] = prodlot_obj.create(
                         cr, uid, prodlot_vals, context=context)
                     context['prodlot_index'] += 1
         return res
@@ -51,20 +50,20 @@ class StockMove(orm.Model):
     def _prepare_lot_for_move(
             self, cr, uid, product_id, move, lot_index, context=None):
         lot_number = "%s-%03d" % (
-            move.prodlot_id.name, lot_index)
+            move.restrict_lot_id.name, lot_index)
         return {
             'name': lot_number,
             'product_id': product_id,
             'company_id': move.company_id.id,
-            'config': move.prodlot_id.config,
+            'config': move.restrict_lot_id.config,
         }
 
     def create_chained_picking(self, cr, uid, moves, context=None):
         new_moves = super(StockMove, self).create_chained_picking(
             cr, uid, moves, context=context)
         for new_move in new_moves:
-            if new_move.move_dest_id.prodlot_id:
+            if new_move.move_dest_id.restrict_lot_id:
                 new_move.write({
-                    'prodlot_id': new_move.move_dest_id.prodlot_id.id,
+                    'restrict_lot_id': new_move.move_dest_id.restrict_lot_id.id,
                     })
         return new_moves

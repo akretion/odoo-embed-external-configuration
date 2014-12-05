@@ -63,6 +63,10 @@ class SaleOrderLine(orm.Model):
         return super(SaleOrderLine, self).copy_data(
             cr, uid, id, default, context=context)
 
+    _defaults = {
+        'config': {'bom': [{'product_id': 5}, {'product_id': 8}, {'product_id': 9}]}
+    }
+
 
 class SaleOrder(orm.Model):
     _inherit = 'sale.order'
@@ -84,7 +88,7 @@ class SaleOrder(orm.Model):
 
     def action_ship_create(self, cr, uid, ids, context=None):
         assert len(ids) == 1, 'This option should only be used for a single id at a time.'
-        prodlot_m = self.pool.get('stock.production.lot')
+        lot_m = self.pool.get('stock.production.lot')
         for sale_order in self.browse(cr, uid, ids, context=context):
             index_lot = 1
             for line in sale_order.order_line:
@@ -92,7 +96,7 @@ class SaleOrder(orm.Model):
                     vals = self._prepare_vals_lot_number(
                         cr, uid, line.id, index_lot, context=context
                     )
-                    lot_id = prodlot_m.create(
+                    lot_id = lot_m.create(
                         cr, uid, vals, context=context
                     )
                     line.write({'lot_id': lot_id})

@@ -134,10 +134,10 @@ class TestSuccess(BaseTest):
         )
         mo = self.mrp_prod_obj.browse(cr, uid, mo_id)
         self.assertEquals(
-            mo.name, move_prod.prodlot_id.name,
+            mo.name, move_prod.lot_id.name,
             "Incorrect name for Manufacturing Order"
         )
-        if move_prod.prodlot_id:
+        if move_prod.lot_id:
             self.assertEquals(
                 mo.move_prod_id.id, mo_vals['move_prod_id'],
                 "Incorrect move to production id"

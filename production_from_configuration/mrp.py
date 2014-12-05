@@ -8,7 +8,7 @@
 #
 ##############################################################################
 
-from osv import orm
+from openerp.osv import orm
 
 
 class MrpProduction(orm.Model):
@@ -38,8 +38,8 @@ class MrpProduction(orm.Model):
         if 'move_prod_id' in vals:
             move = move_obj.browse(
                 cr, uid, vals['move_prod_id'], context=context)
-            if move.prodlot_id:
-                vals['name'] = move.prodlot_id.name
+            if move.lot_id:
+                vals['name'] = move.lot_id.name
         return super(MrpProduction, self).create(
             cr, uid, vals, context=context)
 
@@ -47,7 +47,7 @@ class MrpProduction(orm.Model):
         if context is None:
             context = {}
         ctx = context.copy()
-        ctx['default_prodlot_id'] = production.move_prod_id.prodlot_id.id
+        ctx['default_lot_id'] = production.move_prod_id.lot_id.id
         return super(MrpProduction, self)._make_production_produce_line(
             cr, uid, production, context=ctx)
 
