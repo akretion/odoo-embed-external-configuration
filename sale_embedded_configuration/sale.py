@@ -34,9 +34,31 @@ class SaleOrderLine(orm.Model):
                     field_value)}, context=context)
         return True
 
-    def is_correct_config(self, cr, uid, ids, context=None):
-        """ Technical configuration checker"""
+    def _check_product_data(self, cr, uid, product_data, context=None):
+        product_ids = []
+        for product in product_data:
+            if 'id' not in product:
+                return False
+            if 'qty' in product:
+                if not isinstance(product('qty'), (int, float)):
+                    return False
+            product_ids.append(product['id'])
+        prd_ids = self.pool['product.product'].search(
+            cr, uid, [['id', 'in', list(set(product_ids))]], context=context)
+        if len(prd_ids) != product_ids:
+            return False
         return True
+
+    def is_correct_config(self, cr, uid, ids, context=None):
+        assert len(ids) == 1, 'is_correct_config() should only be used for a single id'
+        sline = self.browse(cr, uid, ids[0], context=context)
+        if sline.product_id and sline.product_id.track_from_sale:
+            if sline.config:
+                product_data = sline.config.get('bom', False)
+                res = False
+                if product_data:
+                    res = self._check_product_data(product_data)
+        return res
 
     _columns = {
         'config': fields.serialized(
@@ -64,7 +86,7 @@ class SaleOrderLine(orm.Model):
             cr, uid, id, default, context=context)
 
     _defaults = {
-        'config': {'bom': [{'product_id': 5}, {'product_id': 8}, {'product_id': 9}]}
+        'config': {'bom': [{'product_id': 5, 'qty': 3}, {'product_id': 6, 'qty': 5}, {'product_id': 4}]}
     }
 
 
