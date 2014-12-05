@@ -49,8 +49,9 @@ class SaleOrderLine(orm.Model):
             type="text",
             string='Configuration'
         ),
-        'prodlot_id': fields.many2one(
+        'lot_id': fields.many2one(
             'stock.production.lot',
+            oldname='lot_id',
             string='Serial Number',
             readonly=True)
     }
@@ -58,7 +59,7 @@ class SaleOrderLine(orm.Model):
     def copy_data(self, cr, uid, id, default=None, context=None):
         if default is None:
             default = {}
-        default['prodlot_id'] = False
+        default['lot_id'] = False
         return super(SaleOrderLine, self).copy_data(
             cr, uid, id, default, context=context)
 
@@ -91,10 +92,10 @@ class SaleOrder(orm.Model):
                     vals = self._prepare_vals_lot_number(
                         cr, uid, line.id, index_lot, context=context
                     )
-                    prodlot_id = prodlot_m.create(
+                    lot_id = prodlot_m.create(
                         cr, uid, vals, context=context
                     )
-                    line.write({'prodlot_id': prodlot_id})
+                    line.write({'lot_id': lot_id})
                     index_lot += 1
         return super(SaleOrder, self).action_ship_create(
             cr, uid, ids, context=context
@@ -105,5 +106,5 @@ class SaleOrder(orm.Model):
         result = super(SaleOrder, self)._prepare_order_line_move(
             cr, uid, order, line, picking_id, date_planned, context=context
         )
-        result.update({'prodlot_id': line.prodlot_id.id})
+        result.update({'lot_id': line.lot_id.id})
         return result

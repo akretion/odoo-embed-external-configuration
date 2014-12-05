@@ -132,11 +132,11 @@ class TestSuccess(BaseTest):
 
         index_lot = 1
         for line in sale_order.order_line:
-            if line.prodlot_id:
+            if line.lot_id:
                 lot_number = "%s-%03d" % (
                     line.order_id.name, index_lot)
                 self.assertEquals(
-                    line.prodlot_id.name, lot_number, "Invalid prodlot number"
+                    line.lot_id.name, lot_number, "Invalid prodlot number"
                 )
                 index_lot += 1
         self.assertNotIn(
@@ -148,12 +148,12 @@ class TestSuccess(BaseTest):
                 "Not enough moves created for the picking"
             )
             for move_line in picking.move_lines:
-                if move_line.prodlot_id :
+                if move_line.lot_id :
                     line = self.order_line_obj.browse(
                         cr, uid, move_line.sale_line_id.id
                     )
                     self.assertEquals(
-                        move_line.prodlot_id.name, line.prodlot_id.name,
+                        move_line.lot_id.name, line.lot_id.name,
                         "Invalid transfered production lot name. Must be\
                         the same name on move line and sale order line"
                     )
