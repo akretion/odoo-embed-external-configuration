@@ -9,7 +9,7 @@
 #
 ##############################################################################
 
-from osv import orm, fields
+from openerp.osv import orm, fields
 import simplejson
 
 

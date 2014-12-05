@@ -2,7 +2,7 @@
 <openerp>
     <data noupdate="1">
 
-        <record id="sale_order_tech_config_rule" model="exception.rule">
+        <record id="sale_order_tech_config_rule" model="sale.rule">
             <field name="name">Bad Technical Configuration</field>
             <field name="description"></field>
             <field name="sequence">50</field>

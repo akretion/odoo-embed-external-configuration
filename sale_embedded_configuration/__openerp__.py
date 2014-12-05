@@ -29,12 +29,16 @@
         Sale Order Line Technical Configuration
     """,
     'author': 'Akretion',
-    'website': '',
-    'depends': ['sale_stock', 'sale_exceptions'],
+    'website': 'http://akretion.com',
+    'depends': [
+        'base_field_serialized',
+        'sale_stock',
+        'sale_exceptions',
+    ],
     'data': [
         'sale_view.xml',
-        'product_view.xml',
-        'sale_data.xml',
+        #'product_view.xml',
+        #'sale_data.xml',
         ],
     'installable': True,
     'auto_install': False,

@@ -8,16 +8,15 @@
 #
 ##############################################################################
 
-from osv import orm, fields
+from openerp.osv import orm, fields
 
 
-class ProductProduct(orm.Model):
-    _inherit = 'product.product'
+class ProductTemplate(orm.Model):
+    _inherit = 'product.template'
 
     _columns = {
         'track_from_sale': fields.boolean(
             'Track Lots since Sale Order',
-            oldname="track_from_order",
             help="Forces to specifiy a Serial Number for all "
                  "moves containing this product since the confirm "
                  "of the Sale Order"
