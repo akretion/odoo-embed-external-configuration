@@ -8,28 +8,24 @@
 #
 ##############################################################################
 
-from openerp.osv import orm, fields
+from openerp import models, fields
 
 
-class ProductTemplate(orm.Model):
+class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    _columns = {
-        'track_from_sale': fields.boolean(
-            'Track Lots since Sale Order',
-            help="Forces to specifiy a Serial Number for all "
-                 "moves containing this product since the confirm "
-                 "of the Sale Order"
-        )
-    }
+    track_from_sale = fields.Boolean(
+        'Track Lots since Sales',
+        help="Forces to specifiy a Serial Number for all "
+             "lines containing this product since the confirm "
+             "of the Sale Order"
+    )
 
 
-class StockProductionLot(orm.Model):
+class StockProductionLot(models.Model):
     _inherit = 'stock.production.lot'
 
-    _columns = {
-        'config': fields.serialized(
-            'Configuration',
-            readonly=True,
-            help="Allow to set custom configuration"),
-    }
+    configuration = fields.Serialized(
+        'Configuration',
+        readonly=True,
+        help="Allow to set custom configuration")
