@@ -31,7 +31,7 @@
     'website': '',
     'depends': [
         'sale_embedded_configuration',
-        'mrp',
+        'mrp_production_notes',
     ],
     'data': [],
     'installable': True,

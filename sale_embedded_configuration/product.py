@@ -9,6 +9,7 @@
 ##############################################################################
 
 from openerp import models, fields
+from openerp.osv import orm, fields as oldfields
 
 
 class ProductTemplate(models.Model):
@@ -22,10 +23,12 @@ class ProductTemplate(models.Model):
     )
 
 
-class StockProductionLot(models.Model):
+class StockProductionLot(orm.Model):
     _inherit = 'stock.production.lot'
 
-    configuration = fields.Serialized(
-        'Configuration',
-        readonly=True,
-        help="Allow to set custom configuration")
+    _columns = {
+        'config': oldfields.serialized(
+            'Configuration',
+            readonly=True,
+            help="Allow to set custom configuration")
+    }

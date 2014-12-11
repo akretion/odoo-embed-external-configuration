@@ -37,12 +37,12 @@ class SaleOrderLine(orm.Model):
     def _check_product_data(self, cr, uid, product_data, context=None):
         product_ids = []
         for product in product_data:
-            if 'id' not in product:
+            if 'product_id' not in product:
                 return False
             if 'qty' in product:
                 if not isinstance(product('qty'), (int, float)):
                     return False
-            product_ids.append(product['id'])
+            product_ids.append(product['product_id'])
         prd_ids = self.pool['product.product'].search(
             cr, uid, [['id', 'in', list(set(product_ids))]], context=context)
         if len(prd_ids) != product_ids:
@@ -50,12 +50,14 @@ class SaleOrderLine(orm.Model):
         return True
 
     def is_correct_config(self, cr, uid, ids, context=None):
-        assert len(ids) == 1, 'is_correct_config() should only be used for a single id'
+        # TODO check than final product_id is not the config
+        assert len(ids) == 1, "is_correct_config() should only be used "
+        "for a single id"
         sline = self.browse(cr, uid, ids[0], context=context)
+        res = False
         if sline.product_id and sline.product_id.track_from_sale:
             if sline.config:
                 product_data = sline.config.get('bom', False)
-                res = False
                 if product_data:
                     res = self._check_product_data(product_data)
         return res
@@ -86,7 +88,9 @@ class SaleOrderLine(orm.Model):
             cr, uid, id, default, context=context)
 
     _defaults = {
-        'config': {'bom': [{'product_id': 5, 'qty': 3}, {'product_id': 6, 'qty': 5}, {'product_id': 4}]}
+        'config': {'bom': [{'product_id': 5, 'qty': 3},
+                {'product_id': 6, 'qty': 5}, {'product_id': 9},
+                {'product_id': 4}]}
     }
 
 
@@ -99,17 +103,19 @@ class SaleOrder(orm.Model):
         order_line = self.pool.get('sale.order.line').browse(
             cr, uid, order_line_id
         )
-        lot_number = "%s-%03d" % (
+        lot_number = "%s-%02d" % (
             order_line.order_id.name, index_lot)
         return {
             'name': lot_number,
             'product_id': order_line.product_id.id,
-            'company_id': order_line.order_id.company_id.id,
+            # in V8 company_id doesn't exist
+            #'company_id': order_line.order_id.company_id.id,
             'config': order_line.config,
         }
 
     def action_ship_create(self, cr, uid, ids, context=None):
-        assert len(ids) == 1, 'This option should only be used for a single id at a time.'
+        assert len(ids) == 1, "This option should only be used "
+        "for a single id at a time."
         lot_m = self.pool.get('stock.production.lot')
         for sale_order in self.browse(cr, uid, ids, context=context):
             index_lot = 1

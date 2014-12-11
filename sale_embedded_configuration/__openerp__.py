@@ -39,7 +39,7 @@
         'sale_view.xml',
         'product_view.xml',
         'sale_data.xml',
-        ],
+    ],
     'installable': True,
     'auto_install': False,
     'application': False,
