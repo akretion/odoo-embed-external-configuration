@@ -34,7 +34,7 @@
         'sale',
     ],
     'data': [
-        'sale_view.xml',
+        #'sale_view.xml',
     ],
     'installable': True,
     'auto_install': False,

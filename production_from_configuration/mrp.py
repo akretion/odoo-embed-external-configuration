@@ -17,13 +17,11 @@ class MrpProduction(orm.Model):
     _inherit = 'mrp.production'
     _service_product_lst = []
     _product_config_dict = {}
-    #'config': {'bom': [{'product_id': 5, 'qty': 3},
-    #        {'product_id': 6, 'qty': 5}, {'product_id': 4}]}
 #[{'workcenter_id': 1, 'cycle': 1.0, 'name': u'first - fab1', 'hour': 0.0, 'sequence': 0}, {'workcenter_id': 2, 'cycle': 1.0, 'name': u'second - fab1', 'hour': 0.0, 'sequence': 0}]
 
-    def _put_note_in_manuf_order(
+    def _format_note_in_manuf_order(
             self, cr, uid, product, context=None):
-        return "Product: %s" % (product.name)
+        return False
 
     def _put_bom_datas(self, cr, uid, product, context=None):
         return {
@@ -69,17 +67,20 @@ class MrpProduction(orm.Model):
         config = self.pool['stock.move'].browse(
             cr, uid, [vals['move_prod_id']],
             context=context).procurement_id.sale_line_id.config
-        for product in config['bom']:
-            self._product_config_dict[product['product_id']] = {
-                'qty': product.get('qty', 1.0)}
-        for product in self.pool['product.product'].browse(
-                cr, uid, self._product_config_dict.keys(), context=context):
-            note = self._put_note_in_manuf_order(
-                cr, uid, product, context=context)
-            if note:
-                notes.append(note)
-        if notes:
-            vals['notes'] = ' - %s' % '\n<br> - '.join(notes)
+        if config:
+            for product in config['bom']:
+                self._product_config_dict[product['product_id']] = {
+                    'qty': product.get('qty', 1.0)}
+            for product in self.pool['product.product'].browse(
+                    cr, uid, self._product_config_dict.keys(),
+                    context=context):
+                if product.type == 'service':
+                    note = self._format_note_in_manuf_order(
+                        cr, uid, product, context=context)
+                    if note:
+                        notes.append(note)
+            if notes:
+                vals['notes'] = ' - %s' % '\n<br> - '.join(notes)
         if 'move_prod_id' in vals:
             move = move_obj.browse(
                 cr, uid, vals['move_prod_id'], context=context)
@@ -127,4 +128,3 @@ class ProcurementOrder(orm.Model):
         context.update({'production_from_procurement': True})
         return super(ProcurementOrder, self).make_mo(
             cr, uid, ids, context=context)
-
