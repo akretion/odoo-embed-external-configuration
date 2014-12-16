@@ -14,8 +14,7 @@ from openerp import models
 class MrpProduction(models.Model):
     _inherit = 'mrp.production'
 
-    def _format_note_in_manuf_order(self, cr, uid, product, context=None):
-        super(MrpProduction, self)._format_note_in_manuf_order(
-            cr, uid, product, context=context)
+    def _format_note_in_manuf_order(self, product):
+        super(MrpProduction, self)._format_note_in_manuf_order(product)
         return "Product: %s  Qty: %s" % (
                product.name, self._product_config_dict[product.id]['qty'])
