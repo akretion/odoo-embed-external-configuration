@@ -10,6 +10,7 @@
 ##############################################################################
 
 from openerp.osv import orm, fields
+from openerp import models, api
 import simplejson
 
 
@@ -94,17 +95,14 @@ class SaleOrderLine(orm.Model):
     }
 
 
-class SaleOrder(orm.Model):
+class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    def _prepare_vals_lot_number(self, cr, uid, order_line_id, index_lot,
-                                 context=None):
+    @api.model
+    def _prepare_vals_lot_number(self, order_line_id, index_lot):
         """Prepare values before creating a lot number"""
-        order_line = self.pool.get('sale.order.line').browse(
-            cr, uid, order_line_id
-        )
-        lot_number = "%s-%02d" % (
-            order_line.order_id.name, index_lot)
+        order_line = self.env['sale.order.line'].browse(order_line_id)
+        lot_number = "%s-%02d" % (order_line.order_id.name, index_lot)
         return {
             'name': lot_number,
             'product_id': order_line.product_id.id,
@@ -113,30 +111,24 @@ class SaleOrder(orm.Model):
             'config': order_line.config,
         }
 
-    def action_ship_create(self, cr, uid, ids, context=None):
-        assert len(ids) == 1, "This option should only be used "
-        "for a single id at a time."
-        lot_m = self.pool.get('stock.production.lot')
-        for sale_order in self.browse(cr, uid, ids, context=context):
+    @api.multi
+    def action_ship_create(self):
+        self.ensure_one()
+        lot_m = self.env['stock.production.lot']
+        for sale_order in self:
             index_lot = 1
             for line in sale_order.order_line:
                 if line.product_id.track_from_sale:
                     vals = self._prepare_vals_lot_number(
-                        cr, uid, line.id, index_lot, context=context
-                    )
-                    lot_id = lot_m.create(
-                        cr, uid, vals, context=context
-                    )
-                    line.write({'lot_id': lot_id})
+                        line.id, index_lot)
+                    lot_id = lot_m.create(vals)
+                    line.write({'lot_id': lot_id.id})
                     index_lot += 1
-        return super(SaleOrder, self).action_ship_create(
-            cr, uid, ids, context=context
-        )
+        return super(SaleOrder, self).action_ship_create()
 
-    def _prepare_order_line_move(self, cr, uid, order, line, picking_id,
-                                 date_planned, context=None):
+    @api.model
+    def _prepare_order_line_move(self, order, line, picking_id, date_planned):
         result = super(SaleOrder, self)._prepare_order_line_move(
-            cr, uid, order, line, picking_id, date_planned, context=context
-        )
+            order, line, picking_id, date_planned)
         result.update({'lot_id': line.lot_id.id})
         return result
