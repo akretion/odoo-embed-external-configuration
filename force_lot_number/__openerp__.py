@@ -26,12 +26,12 @@
     'version': '0.5',
     'category': 'Generic Modules',
     'description': """
-        Put an external reference in sale order line
+        Allows to customize lot number
     """,
     'author': 'Akretion',
     'website': 'http://akretion.com',
     'depends': [
-        'sale',
+        'sale_embedded_configuration',
     ],
     'data': [
         'sale_view.xml',
