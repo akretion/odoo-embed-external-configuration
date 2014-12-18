@@ -15,4 +15,5 @@ from openerp import models, fields
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    external_ref = fields.Char(string="External Reference")
+    lot_number = fields.Char(
+        help="Customized lot number")

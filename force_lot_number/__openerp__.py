@@ -22,7 +22,7 @@
 
 
 {
-    'name': 'Sale External Reference',
+    'name': 'Force Lot Number',
     'version': '0.5',
     'category': 'Generic Modules',
     'description': """
@@ -34,7 +34,7 @@
         'sale',
     ],
     'data': [
-        #'sale_view.xml',
+        'sale_view.xml',
     ],
     'installable': True,
     'auto_install': False,
