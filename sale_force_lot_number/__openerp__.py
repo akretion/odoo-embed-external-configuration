@@ -22,7 +22,7 @@
 
 
 {
-    'name': 'Force Lot Number',
+    'name': 'Sale Force Lot Number',
     'version': '0.5',
     'category': 'Generic Modules',
     'description': """
