@@ -8,11 +8,7 @@
 #
 ##############################################################################
 
-from openerp.osv import orm
 from openerp import models, api
-
-
-#[{'workcenter_id': 1, 'cycle': 1.0, 'name': u'first - fab1', 'hour': 0.0, 'sequence': 0}, {'workcenter_id': 2, 'cycle': 1.0, 'name': u'second - fab1', 'hour': 0.0, 'sequence': 0}]
 
 
 class MrpProduction(models.Model):
@@ -25,7 +21,10 @@ class MrpProduction(models.Model):
     def _format_note_in_manuf_order(self, product):
         return False
 
-    def _put_bom_datas(self, product):
+    def _put_workcenter_data(self, product):
+        return {}
+
+    def _put_bom_data(self, product):
         return {
             'name': product.name,
             'product_id': product.id,
@@ -36,19 +35,26 @@ class MrpProduction(models.Model):
         }
 
     @api.model
-    def _get_mrp_data_from_config(self, production, product_data):
+    def _get_mrp_data_from_config(
+            self, production, product_data, workcenter_data):
         config = production.move_prod_id.procurement_id.sale_line_id.config
         if not config:
             return []
         config_product_data = []
+        config_workcenter_data = []
         for product in self.env['product.product'].browse(
                 self._product_config_dict.keys()):
             if product.type in ('product', 'consu'):
                 config_product_data.append(
-                    self._put_bom_datas(product))
+                    self._put_bom_data(product))
+                workc_data = self._put_workcenter_data(product)
+                if workc_data:
+                    config_workcenter_data.append(workc_data)
             else:
                 self._service_product_lst.append(product.id)
-        return config_product_data
+        if not config_workcenter_data:
+            config_workcenter_data = list(workcenter_data)
+        return (config_product_data, config_workcenter_data)
 
     @api.multi
     def _action_compute_lines(self, properties=None):
@@ -93,16 +99,20 @@ class MrpBom(models.Model):
         prod_m = self.env['mrp.production']
         product_data, workcenter_data = super(
             MrpBom, self)._bom_explode(
-                bom, product, factor, properties=properties,
-                level=level, routing_id=routing_id,
-                previous_products=previous_products, master_bom=master_bom)
+                bom, product, factor,
+                properties=properties,
+                level=level,
+                routing_id=routing_id,
+                previous_products=previous_products,
+                master_bom=master_bom)
         production = False
         if 'production' in self.env.context:
             production = self.env.context['production']
         if production:
-            new_product_data = prod_m._get_mrp_data_from_config(
-                production, product_data)
+            new_product_d, new_workcenter_d = prod_m._get_mrp_data_from_config(
+                production, product_data, workcenter_data)
             del product_data
-            product_data = list(new_product_data)
-        return product_data, workcenter_data
-
+            del workcenter_data
+            product_data = list(new_product_d)
+            workcenter_data = list(new_workcenter_d)
+        return (product_data, workcenter_data)
