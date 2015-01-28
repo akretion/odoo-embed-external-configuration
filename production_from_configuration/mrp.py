@@ -21,10 +21,7 @@ class MrpProduction(models.Model):
     def _format_note_in_manuf_order(self, product):
         return False
 
-    def _put_workcenter_data(self, product):
-        return {}
-
-    def _put_bom_data(self, product):
+    def _prepare_bom_data(self, product):
         return {
             'name': product.name,
             'product_id': product.id,
@@ -36,7 +33,7 @@ class MrpProduction(models.Model):
 
     @api.model
     def _get_mrp_data_from_config(
-            self, production, product_data, workcenter_data):
+            self, production, product, product_data, workcenter_data):
         config = production.move_prod_id.procurement_id.sale_line_id.config
         if not config:
             return []
@@ -46,7 +43,7 @@ class MrpProduction(models.Model):
                 self._product_config_dict.keys()):
             if product.type in ('product', 'consu'):
                 config_product_data.append(
-                    self._put_bom_data(product))
+                    self._prepare_bom_data(product))
                 workc_data = self._put_workcenter_data(product)
                 if workc_data:
                     config_workcenter_data.append(workc_data)
@@ -65,28 +62,31 @@ class MrpProduction(models.Model):
                 properties=properties)
         return res
 
-    @api.model
-    def create(self, vals):
-        move_obj = self.env['stock.move']
-        notes = []
-        move = self.env['stock.move'].browse([vals['move_prod_id']])
-        config = move.procurement_id.sale_line_id.config
-        if config:
-            for product in config['bom']:
-                self._product_config_dict[product['product_id']] = {
-                    'qty': product.get('qty', 1.0)}
-            for product in self.env['product.product'].browse(
-                    self._product_config_dict.keys()):
-                if product.type == 'service':
-                    note = self._format_note_in_manuf_order(product)
-                    if note:
-                        notes.append(note)
-            if notes:
-                vals['notes'] = ' - %s' % '\n<br> - '.join(notes)
-        if 'move_prod_id' in vals:
-            move = move_obj.browse(vals['move_prod_id'])
-            vals['name'] = move.procurement_id.sale_line_id.lot_id.name
-        return super(MrpProduction, self).create(vals)
+    #@api.model
+    #def create(self, vals):
+    #    move_obj = self.env['stock.move']
+    #    notes = []
+    #    move = self.env['stock.move'].browse([vals['move_prod_id']])
+    #    config = move.procurement_id.sale_line_id.config
+    #    if config and 'bom' in config:
+    #        for product in config['bom']:
+    #            self._product_config_dict[product['product_id']] = {
+    #                'qty': product.get('qty', 1.0)}
+    #        for product in self.env['product.product'].browse(
+    #                self._product_config_dict.keys()):
+    #            if product.type == 'service':
+    #                note = self._format_note_in_manuf_order(product)
+    #                if note:
+    #                    notes.append(note)
+    #        if notes:
+    #            vals['notes'] = ' - %s' % '\n<br> - '.join(notes)
+    #    if 'move_prod_id' in vals:
+    #        move = move_obj.browse(vals['move_prod_id'])
+    #        vals['name'] = move.procurement_id.sale_line_id.lot_id.name
+    #    if not vals.get('name'):
+    #        vals['name'] = '_'
+    #    print vals
+    #    return super(MrpProduction, self).create(vals)
 
 
 class MrpBom(models.Model):
@@ -110,7 +110,7 @@ class MrpBom(models.Model):
             production = self.env.context['production']
         if production:
             new_product_d, new_workcenter_d = prod_m._get_mrp_data_from_config(
-                production, product_data, workcenter_data)
+                production, product, product_data, workcenter_data)
             del product_data
             del workcenter_data
             product_data = list(new_product_d)
