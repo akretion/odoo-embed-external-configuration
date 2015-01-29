@@ -18,9 +18,11 @@ class MrpProduction(models.Model):
     _service_product_lst = []
     _product_config_dict = {}
 
+    @api.model
     def _format_note_in_manuf_order(self, product):
         return False
 
+    @api.model
     def _prepare_bom_data(self, product):
         return {
             'name': product.name,
@@ -88,6 +90,8 @@ class MrpProduction(models.Model):
     #    print vals
     #    return super(MrpProduction, self).create(vals)
 
+TOTO = 0
+
 
 class MrpBom(models.Model):
     _inherit = 'mrp.bom'
@@ -96,6 +100,7 @@ class MrpBom(models.Model):
     def _bom_explode(self, bom, product, factor, properties=None, level=0,
                      routing_id=False, previous_products=None,
                      master_bom=None):
+        global TOTO
         prod_m = self.env['mrp.production']
         product_data, workcenter_data = super(
             MrpBom, self)._bom_explode(
@@ -108,11 +113,24 @@ class MrpBom(models.Model):
         production = False
         if 'production' in self.env.context:
             production = self.env.context['production']
-        if production:
+        #import pdb;pdb.set_trace()
+        #self.with_context(production_triggered=False)
+        print 'self.env.context', self._context
+        #if production and 'production_triggered' not in self._context:
+        print TOTO
+        if production and TOTO == 0:
+        #if production:
+            TOTO += 1
+            self = self.with_context(production_triggered=True)
+            #print '   IN BOM _ctx ', self._context
+            print '        ONCE  '
             new_product_d, new_workcenter_d = prod_m._get_mrp_data_from_config(
                 production, product, product_data, workcenter_data)
+            #print '   IN BOM agaiNNNNN _context', self._context
+            #import pdb;pdb.set_trace()
             del product_data
             del workcenter_data
             product_data = list(new_product_d)
             workcenter_data = list(new_workcenter_d)
+        print '  >>>>> IN BOM', product_data, workcenter_data
         return (product_data, workcenter_data)
