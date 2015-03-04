@@ -99,6 +99,11 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     @api.model
+    def _prepare_sale_line(self, sale_line):
+        """Prepare values to override sale line fields"""
+        return {}
+
+    @api.model
     def _prepare_vals_lot_number(self, order_line_id, index_lot):
         """Prepare values before creating a lot number"""
         order_line = self.env['sale.order.line'].browse(order_line_id)
@@ -118,16 +123,21 @@ class SaleOrder(models.Model):
         for sale_order in self:
             index_lot = 1
             for line in sale_order.order_line:
+                line_vals = {}
                 if line.product_id.track_from_sale:
                     vals = self._prepare_vals_lot_number(
                         line.id, index_lot)
-                    lot_id = lot_m.create(vals)
-                    line.write({'lot_id': lot_id.id})
                     index_lot += 1
+                    lot_id = lot_m.create(vals)
+                    line_vals['lot_id'] = lot_id.id
+                line_vals.update(self._prepare_sale_line(line))
+                if line_vals:
+                    line.write(line_vals)
         return super(SaleOrder, self).action_ship_create()
 
     @api.model
     def _prepare_order_line_move(self, order, line, picking_id, date_planned):
+        """ original method is in module purchase/purchase.py """
         result = super(SaleOrder, self)._prepare_order_line_move(
             order, line, picking_id, date_planned)
         result.update({'lot_id': line.lot_id.id})
