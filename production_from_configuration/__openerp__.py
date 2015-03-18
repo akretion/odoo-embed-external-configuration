@@ -25,13 +25,13 @@
     'version': '1.0',
     'category': 'Generic Modules',
     'description': """
-        Production From Configuration
+        production from configuration
     """,
     'author': 'Akretion',
     'website': '',
     'depends': [
         'sale_embedded_configuration',
-        'mrp_production_notes',
+        'mrp_production_note',
     ],
     'data': [],
     'installable': True,
