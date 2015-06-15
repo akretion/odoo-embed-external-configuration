@@ -59,7 +59,7 @@ class MrpProduction(models.Model):
     def _action_compute_lines(self, properties=None):
         res = []
         for production in self:
-            self = self.with_context(production=production)
+            self = self.with_context(production_id=production.id)
             res = super(MrpProduction, self)._action_compute_lines(
                 properties=properties)
         return res
@@ -108,8 +108,9 @@ class MrpBom(models.Model):
                 previous_products=previous_products,
                 master_bom=master_bom)
         production = False
-        if 'production' in self.env.context:
-            production = self.env.context['production']
+        if 'production_id' in self.env.context:
+            production = self.env['mrp.production'].browse(
+                self.env.context['production_id'])
         if production:
             new_product_d, new_workcenter_d = prod_m._get_mrp_data_from_config(
                 production, product, product_data, workcenter_data)
