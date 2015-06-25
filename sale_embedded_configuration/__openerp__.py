@@ -34,10 +34,10 @@
         'base_field_serialized',
         'sale_stock',
         'sale_exceptions',
+        'sale_prodlot',
     ],
     'data': [
         'sale_view.xml',
-        'product_view.xml',
         'sale_data.xml',
     ],
     'installable': True,
