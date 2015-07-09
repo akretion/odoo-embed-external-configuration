@@ -55,15 +55,6 @@ class MrpProduction(models.Model):
             config_workcenter_data = list(workcenter_data)
         return (config_product_data, config_workcenter_data)
 
-    @api.multi
-    def _action_compute_lines(self, properties=None):
-        res = []
-        for production in self:
-            self = self.with_context(production_id=production.id)
-            res = super(MrpProduction, self)._action_compute_lines(
-                properties=properties)
-        return res
-
     #@api.model
     #def create(self, vals):
     #    move_obj = self.env['stock.move']

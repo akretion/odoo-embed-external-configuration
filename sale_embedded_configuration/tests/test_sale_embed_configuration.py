@@ -42,7 +42,7 @@ class BaseTest(TransactionCase):
             'sale_ok' : True,
             'procure_method' : 'make_to_order',
             'supply_method' : 'produce',
-            'track_from_sale' : True,
+            'auto_generate_prodlot' : True,
         }
         self.product_ids.append(
             self.product_obj.create(cr, uid, vals_1)
@@ -55,7 +55,7 @@ class BaseTest(TransactionCase):
             'purchase_ok' : True,
             'procure_method' : 'make_to_order',
             'supply_method' : 'produce',
-            'track_from_sale' : False,
+            'auto_generate_prodlot' : False,
         }
         self.product_ids.append(
             self.product_obj.create(cr, uid, vals)
